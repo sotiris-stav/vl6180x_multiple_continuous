@@ -1,6 +1,6 @@
-#include <VL6180X.h>
-#include <Wire.h>
-//#define ROS/
+#include <VL6180X.h> //pololu library for the sensor
+#include <Wire.h>    //arduino i2c library 
+#define ROS          //use this when communicating wirh ROS
 #ifdef ROS
   #define USE_USBCON
   #include <ros.h>
@@ -12,19 +12,23 @@
   #define BAUD 57600
 #endif
 
-#define NS 8
-// address we will assign if dual sensor is present
-uint8_t initial_address = 0x30;
-//uint8_t shutdown_pins[] = {14, 32, 15, 33, 27, 12, A0, A1, A5, 21};
+#define NS 8 //number of utilized sensors. maximum 8 per board.
+
+uint8_t initial_address = 0x30; //the initial i2c address
+
+//enable/shutdown pins to initialize the sensors
 uint8_t shutdown_pins[] = {A0, A1, A2, A3, A4, A5, 9, 10, 33, 27, 13, 12};
 
+//array that stores the sensor measurements
 uint16_t measure[NS];
-uint16_t temp_measure;
 
+//array that stores the sensor objects
 VL6180X lox[NS];
 
+//resets pins by driving them low, disabling the sensors
 void setupPins()
 {
+  
   // initializing SHUTX pins
   int i = 0;
   for (i = 0; i < NS; i++)
@@ -54,12 +58,19 @@ void setupAddresses() {
   
   for (i = 0; i < NS; i++)
   {
+    //here we set the pins to read since the sensors EN
+    //are pulled-up by default
+    //not doing this and setting the pin to high through output
+    //caused issues with multiple sensors (probably high power draw)
     pinMode(shutdown_pins[i], INPUT);
     delay(10);
+
+    //set address and init sensor with default values
     lox[i].setAddress(cur_address++);
     lox[i].init();
   }
 
+  //changing parameters to allow greater range, ~40cm, 40ms
   for (i = 0; i < NS; i++)
   {
     lox[i].configureDefault();
@@ -79,6 +90,7 @@ void setupAddresses() {
   }
 }
 
+//setups the ros communication (topic publisher)
 void setupRosComm()
 {
 
@@ -101,6 +113,8 @@ void setup()
   while (! Serial) { delay(1); }
   #endif
   Wire.begin();
+  //sets the i2c frequency, should be adjusted depending 
+  //on number of sensors, length of channel (noise-capacitance)  
   Wire.setClock(100000L);
 
   setupPins();
@@ -109,6 +123,7 @@ void setup()
 
 }
 
+//read sensor measurements, if not ROS prints them in arduino serial monitor
 void read_all_sensors() {
   int i = 0;
 
@@ -129,6 +144,7 @@ void read_all_sensors() {
   #endif
 }
 
+//main loop, calls the read_all_sensors, and publish to ROS if enabled
 void loop()
 {  
   delay(20);
