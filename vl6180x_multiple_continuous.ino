@@ -17,7 +17,7 @@
 uint8_t initial_address = 0x30; //the initial i2c address
 
 //enable/shutdown pins to initialize the sensors
-uint8_t shutdown_pins[] = {A0, A1, A2, A3, A4, A5, 9, 10, 33, 27, 13, 12};
+uint8_t shutdown_pins[] = {A0, A1, A2, A3, A4, A5, 9, 10};
 
 //array that stores the sensor measurements
 uint16_t measure[NS];
