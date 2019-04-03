@@ -7,7 +7,7 @@
   #include <std_msgs/UInt16MultiArray.h>
 
   std_msgs::UInt16MultiArray measure_msg;
-  ros::Publisher p("distance_sensor_topic_left", &measure_msg);
+  ros::Publisher p("distance_sensor_topic_left", &measure_msg); //change name of topic if right arm to avoid conflicts
   ros::NodeHandle nh;
   #define BAUD 57600
 #endif
