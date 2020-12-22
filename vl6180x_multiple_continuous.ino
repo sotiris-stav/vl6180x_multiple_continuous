@@ -1,13 +1,13 @@
 #include <VL6180X.h> //pololu library for the sensor
 #include <Wire.h>    //arduino i2c library 
-#define ROS          //use this when communicating wirh ROS
+#define ROS          //use this when communicating with ROS
 #ifdef ROS
   #define USE_USBCON
   #include <ros.h>
   #include <std_msgs/UInt16MultiArray.h>
 
   std_msgs::UInt16MultiArray measure_msg;
-  ros::Publisher p("distance_sensor_topic_left", &measure_msg); //change name of topic if right arm to avoid conflicts
+  ros::Publisher p("distance_sensor_topic", &measure_msg);
   ros::NodeHandle nh;
   #define BAUD 57600
 #endif
